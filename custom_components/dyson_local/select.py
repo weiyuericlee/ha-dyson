@@ -48,6 +48,7 @@ OSCILLATION_MODE_STR_TO_ENUM = {
 }
 
 HOT_COOL_OSCILLATION_MODE_ENUM_TO_STR = {
+    HotCoolOscillationMode.OFF: "Off",
     HotCoolOscillationMode.DEGREE_45: "45°",
     HotCoolOscillationMode.DEGREE_90: "90°",
     HotCoolOscillationMode.DEGREE_180: "180°",

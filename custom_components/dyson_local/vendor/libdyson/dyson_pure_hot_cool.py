@@ -16,9 +16,33 @@ class DysonPureHotCool(DysonPureCoolBase, DysonHeatingDevice):
         return self._get_field_value(self._status, "oson") == "ON"
 
     @property
+    def oscillation_angle_low(self) -> int:
+        """Return oscillation low angle."""
+        return int(self._get_field_value(self._status, "osal"))
+
+    @property
+    def oscillation_angle_high(self) -> int:
+        """Return oscillation high angle."""
+        return int(self._get_field_value(self._status, "osau"))
+
+    @property
     def oscillation_mode(self) -> HotCoolOscillationMode:
         """Return oscillation mode."""
-        return HotCoolOscillationMode(self._get_field_value(self._status, "ancp"))
+        oscillation = self.oscillation
+        angle_low = self.oscillation_angle_low
+        angle_high = self.oscillation_angle_high
+        if oscillation:
+            angle_diff = angle_high-angle_low
+            if angle_diff == 44:
+                return HotCoolOscillationMode.DEGREE_45
+            elif angle_diff == 90:
+                return HotCoolOscillationMode.DEGREE_90
+            elif angle_diff == 180:
+                return HotCoolOscillationMode.DEGREE_180
+            elif angle_diff == 350:
+                return HotCoolOscillationMode.DEGREE_350
+        else:
+            return HotCoolOscillationMode.OFF
 
     def enable_oscillation(
         self, oscillation_mode: Optional[HotCoolOscillationMode] = None
@@ -26,8 +50,12 @@ class DysonPureHotCool(DysonPureCoolBase, DysonHeatingDevice):
         """Turn on oscillation."""
         if oscillation_mode is None:
             oscillation_mode = self.oscillation_mode
-
-        self._set_configuration(oson="ON", fpwr="ON", ancp=oscillation_mode.value)
+            if oscillation_mode == HotCoolOscillationMode.OFF:
+                oscillation_mode = HotCoolOscillationMode.DEGREE_45
+        elif oscillation_mode == HotCoolOscillationMode.OFF:
+            self._set_configuration(oson="OFF")
+        else:
+            self._set_configuration(oson="ON", fpwr="ON", ancp=oscillation_mode.value)
 
     def disable_oscillation(self) -> None:
         """Turn off oscillation."""

@@ -73,6 +73,7 @@ class HumidifyOscillationMode(Enum):
 class HotCoolOscillationMode(Enum):
     """Pure Hot+Cool oscillation mode."""
 
+    OFF = "0000"
     DEGREE_45 = "0045"
     DEGREE_90 = "0090"
     DEGREE_180 = "0180"
