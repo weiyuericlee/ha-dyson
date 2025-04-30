@@ -31,7 +31,10 @@ class DysonPureHotCool(DysonPureCoolBase, DysonHeatingDevice):
         oscillation = self.oscillation
         angle_low = self.oscillation_angle_low
         angle_high = self.oscillation_angle_high
-        if oscillation:
+        oscillation_mode = self._get_field_value(self._status, "ancp")
+        if not oscillation:
+            return HotCoolOscillationMode.OFF
+        elif oscillation_mode == 'CUST':
             angle_diff = angle_high-angle_low
             if angle_diff == 44:
                 return HotCoolOscillationMode.DEGREE_45
@@ -42,17 +45,15 @@ class DysonPureHotCool(DysonPureCoolBase, DysonHeatingDevice):
             elif angle_diff == 350:
                 return HotCoolOscillationMode.DEGREE_350
         else:
-            return HotCoolOscillationMode.OFF
+            return HotCoolOscillationMode(oscillation_mode)
 
     def enable_oscillation(
         self, oscillation_mode: Optional[HotCoolOscillationMode] = None
     ) -> None:
         """Turn on oscillation."""
         if oscillation_mode is None:
-            oscillation_mode = self.oscillation_mode
-            if oscillation_mode == HotCoolOscillationMode.OFF:
-                oscillation_mode = HotCoolOscillationMode.DEGREE_45
-        elif oscillation_mode == HotCoolOscillationMode.OFF:
+            oscillation_mode = HotCoolOscillationMode.DEGREE_45
+        if oscillation_mode == HotCoolOscillationMode.OFF:
             self._set_configuration(oson="OFF")
         else:
             self._set_configuration(oson="ON", fpwr="ON", ancp=oscillation_mode.value)
