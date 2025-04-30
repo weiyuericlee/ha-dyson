@@ -14,9 +14,6 @@ WATER_HARDNESS_STR_TO_ENUM = {
     str_: enum for enum, str_ in WATER_HARDNESS_ENUM_TO_STR.items()
 }
 
-import logging
-_LOGGER = logging.getLogger(__name__)
-
 
 class DysonPurifierHumidifyCool(DysonPureCoolBase):
     """Dyson Pure Humidify+Cool device."""
@@ -29,8 +26,6 @@ class DysonPurifierHumidifyCool(DysonPureCoolBase):
     @property
     def oscillation_mode(self) -> HumidifyOscillationMode:
         """Return oscillation mode."""
-        _LOGGER.warning(f"{self._status=}")
-        _LOGGER.warning(f"{HumidifyOscillationMode(self._get_field_value(self._status, "ancp"))=}")
         return HumidifyOscillationMode(self._get_field_value(self._status, "ancp"))
 
     @property
