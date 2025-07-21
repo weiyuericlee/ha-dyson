@@ -92,8 +92,6 @@ class DysonFanEntity(DysonEntity, FanEntity):
 
     _MESSAGE_TYPE = MessageType.STATE
 
-    _attr_translation_key = "dyson"
-
     @property
     def is_on(self) -> bool:
         """Return if the fan is on."""
