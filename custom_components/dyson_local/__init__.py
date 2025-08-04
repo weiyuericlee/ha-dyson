@@ -212,7 +212,7 @@ def _async_get_platforms(device: DysonDevice) -> List[str]:
         return ["binary_sensor", "sensor", "vacuum"]
     platforms = ["fan", "select", "sensor", "switch"]
     if isinstance(device, DysonPureHotCool):
-        platforms.append("climate")
+        platforms.extend(["number", "climate"])
     if isinstance(device, DysonPureHotCoolLink):
         platforms.extend(["binary_sensor", "climate"])
     if isinstance(device, DysonPurifierHumidifyCool):

@@ -1,11 +1,14 @@
 """Dyson Pure Hot+Cool device."""
 
+import logging
 from typing import Optional
 
 from .dyson_device import DysonHeatingDevice, TIMEOUT
 from .dyson_pure_cool import DysonPureCoolBase
 
 from .const import HotCoolOscillationMode
+
+_LOGGER = logging.getLogger(__name__)
 
 class DysonPureHotCool(DysonPureCoolBase, DysonHeatingDevice):
     """Dyson Pure Hot+Cool device."""
@@ -15,6 +18,18 @@ class DysonPureHotCool(DysonPureCoolBase, DysonHeatingDevice):
         """Return oscillation status."""
         return self._get_field_value(self._status, "oson") == "ON"
 
+    @property
+    def oscillation_target(self) -> int:
+        """Return oscillation low angle."""
+        try:
+            lower = int(self._get_field_value(self._status, "osal"))
+            upper = int(self._get_field_value(self._status, "osau"))
+            _LOGGER.debug(f"Lower angle: {lower}, Upper angle: {upper}")
+            return (lower+upper) / 2 
+        except ValueError:
+            _LOGGER.debug(f"Using default angle [{self._get_field_value(self._status, "osal")}/{self._get_field_value(self._status, "osau")}]")
+            return 180.0
+        
     @property
     def oscillation_angle_low(self) -> int:
         """Return oscillation low angle."""
@@ -84,3 +99,7 @@ class DysonPureHotCool(DysonPureCoolBase, DysonHeatingDevice):
         """Turn off oscillation."""
         angle_target = int((self.oscillation_angle_low+self.oscillation_angle_high) / 2)
         self._set_configuration(oson="OFF", osal=f"{angle_target:04d}", osau=f"{angle_target:04d}")
+
+    def set_oscillation_target(self, target) -> None:
+        """Turn off oscillation."""
+        self._set_configuration(oson="ON", fpwr="ON", ancp='CUST', osal=f"{int(target):04d}", osau=f"{int(target):04d}")
