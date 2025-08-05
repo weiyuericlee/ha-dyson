@@ -100,5 +100,5 @@ class DysonPureHotCool(DysonPureCoolBase, DysonHeatingDevice):
         self._set_configuration(oson="OFF", osal=f"{self.oscillation_target:04d}", osau=f"{self.oscillation_target:04d}")
 
     def set_oscillation_target(self, target) -> None:
-        """Turn off oscillation."""
+        """Set oscillation target."""
         self._set_configuration(oson="ON", fpwr="ON", ancp='CUST', osal=f"{int(target):04d}", osau=f"{int(target):04d}")

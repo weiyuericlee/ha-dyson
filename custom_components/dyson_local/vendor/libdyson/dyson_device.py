@@ -176,6 +176,7 @@ class DysonDevice:
         client.subscribe(self._status_topic)
         for callback in self._callbacks:
             callback(MessageType.STATE)
+            callback(MessageType.ALL)
 
     def _on_disconnect(self, client, userdata, rc):
         _LOGGER.debug(f"Disconnected with result code {str(rc)}")
@@ -183,6 +184,7 @@ class DysonDevice:
         self._disconnected.set()
         for callback in self._callbacks:
             callback(MessageType.STATE)
+            callback(MessageType.ALL)
 
     def _on_message(self, client, userdata: Any, msg: mqtt.MQTTMessage):
         payload = json.loads(msg.payload.decode("utf-8"))
@@ -196,6 +198,7 @@ class DysonDevice:
                 self._status_data_available.set()
             for callback in self._callbacks:
                 callback(MessageType.STATE)
+                callback(MessageType.ALL)
 
     @abstractmethod
     def _update_status(self, payload: dict) -> None:
@@ -352,6 +355,7 @@ class DysonFanDevice(DysonDevice):
                 self._environmental_data_available.set()
             for callback in self._callbacks:
                 callback(MessageType.ENVIRONMENTAL)
+                callback(MessageType.ALL)
 
     def _update_status(self, payload: dict) -> None:
         self._status = payload["product-state"]

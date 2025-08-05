@@ -45,7 +45,7 @@ class DysonOscillationTargetNumber(DysonEntity, NumberEntity):
     _attr_native_unit_of_measurement = "°"
     _attr_entity_category = EntityCategory.DIAGNOSTIC
     _attr_device_class = NumberDeviceClass.WIND_DIRECTION
-    _MESSAGE_TYPE = MessageType.ENVIRONMENTAL
+    _MESSAGE_TYPE = MessageType.ALL
 
     def __init__(self, device, name):
         """Initialize the number entity."""

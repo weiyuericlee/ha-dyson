@@ -52,6 +52,7 @@ class MessageType(Enum):
 
     STATE = auto()
     ENVIRONMENTAL = auto()
+    ALL = auto()
 
 
 class AirQualityTarget(Enum):
