@@ -21,15 +21,16 @@ class DysonPureHotCool(DysonPureCoolBase, DysonHeatingDevice):
     @property
     def oscillation_target(self) -> int:
         """Return oscillation low angle."""
+        target = 180
         try:
             lower = int(self._get_field_value(self._status, "osal"))
             upper = int(self._get_field_value(self._status, "osau"))
             _LOGGER.debug(f"Lower angle: {lower}, Upper angle: {upper}")
-            return (lower+upper) / 2 
+            target = (lower+upper) / 2 
         except ValueError:
             _LOGGER.debug(f"Using default angle [{self._get_field_value(self._status, "osal")}/{self._get_field_value(self._status, "osau")}]")
-            return 180.0
-        
+        return int(target)
+
     @property
     def oscillation_angle_low(self) -> int:
         """Return oscillation low angle."""
@@ -66,13 +67,12 @@ class DysonPureHotCool(DysonPureCoolBase, DysonHeatingDevice):
         self, oscillation_mode: Optional[HotCoolOscillationMode] = None
     ) -> None:
         """Turn on oscillation."""
-        angle_target = int((self.oscillation_angle_low+self.oscillation_angle_high) / 2)
         if oscillation_mode is None:
             oscillation_mode = HotCoolOscillationMode.DEGREE_45
         if oscillation_mode == HotCoolOscillationMode.OFF:
-            self._set_configuration(oson="OFF", osal=f"{angle_target:04d}", osau=f"{angle_target:04d}")
+            self._set_configuration(oson="OFF", osal=f"{self.oscillation_target:04d}", osau=f"{self.oscillation_target:04d}")
         else:
-            angle_low = angle_high = angle_target
+            angle_low = angle_high = self.oscillation_target
             if oscillation_mode == HotCoolOscillationMode.DEGREE_45:
                 angle_low -= 22
                 angle_high += 22
@@ -97,8 +97,7 @@ class DysonPureHotCool(DysonPureCoolBase, DysonHeatingDevice):
 
     def disable_oscillation(self) -> None:
         """Turn off oscillation."""
-        angle_target = int((self.oscillation_angle_low+self.oscillation_angle_high) / 2)
-        self._set_configuration(oson="OFF", osal=f"{angle_target:04d}", osau=f"{angle_target:04d}")
+        self._set_configuration(oson="OFF", osal=f"{self.oscillation_target:04d}", osau=f"{self.oscillation_target:04d}")
 
     def set_oscillation_target(self, target) -> None:
         """Turn off oscillation."""
